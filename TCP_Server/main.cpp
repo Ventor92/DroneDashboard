@@ -23,23 +23,29 @@ int main(int argc, char *argv[])
     CliEngine cliEngine;
     TcpServer tcpServer;
 
-    QThread threadWorkerData;
-    WorkerData workerData;
+    WorkerThread threadWorkerData;
+    // WorkerData workerData;
 
-    workerData.moveToThread(&threadWorkerData);
-
-    // Połączenie sygnałów i slotów
-    QObject::connect(&workerData, &WorkerData::newData, &tcpServer, &TcpServer::processData);
-
-    QTimer timer;
-    timer.moveToThread(&threadWorkerData);
-    QObject::connect(&timer, &QTimer::timeout, &workerData, &WorkerData::doWork);
-
-    QObject::connect(&threadWorkerData, &QThread::started, [&]() {
-        timer.start(2000); // Interwał w milisekundach (1 sekunda)
-    });
+    // workerData.moveToThread(&threadWorkerData);
 
     threadWorkerData.start();
+    // Połączenie sygnałów i slotów
+    const WorkerData *const ptrWD = threadWorkerData.m_worker;
+
+    QObject::connect(&threadWorkerData, &QThread::started, [&]() {
+        QObject::connect(ptrWD, &WorkerData::newData, &tcpServer, &TcpServer::processData); // Interwał w milisekundach (1 sekunda)
+    });
+
+    // QTimer timer;
+    // timer.moveToThread(&threadWorkerData);
+    // QObject::connect(&timer, &QTimer::timeout, &workerData, &WorkerData::doWork);
+
+    // QObject::connect(&threadWorkerData, &QThread::started, [&]() {
+    //     timer.start(2000); // Interwał w milisekundach (1 sekunda)
+    // });
+
+
+
 
     // Set up code that uses the Qt event loop here.
     // Call a.quit() or a.exit() to quit the application.

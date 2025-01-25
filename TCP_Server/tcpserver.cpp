@@ -38,6 +38,39 @@ void TcpServer::displayMessage(const QString& str)
 void TcpServer::processData(const int id, const QString &text)
 {
     displayMessage(QString("INFO :: próba wysłania %1 %2").arg(id).arg(text));
+
+    QByteArray header;
+    header.prepend(QString("fileType:message,fileName:null,fileSize:%1;").arg(text.size()).toUtf8());
+    header.resize(128);
+
+    QByteArray byteArray = text.toUtf8();
+    byteArray.prepend(header);
+
+    foreach (QTcpSocket* socket,connection_set)
+    {
+        sendMessage(socket, byteArray);
+    }
+}
+
+
+void TcpServer::sendMessage(QTcpSocket* socket, const QByteArray &byteArray)
+{
+    if(socket)
+    {
+        if(socket->isOpen())
+        {
+            QDataStream socketStream(socket);
+            socketStream.setVersion(QDataStream::Qt_5_15);
+            socketStream << byteArray;
+            displayMessage(QString("INFO :: OK, byte array has been send!"));
+        }
+        else
+            displayMessage(QString("ERROR :: Socket doesn't seem to be opened"));
+    }
+    else
+    {
+        displayMessage(QString("WARN :: Not connected!"));
+    }
 }
 
 void TcpServer::newConnectionDetected()

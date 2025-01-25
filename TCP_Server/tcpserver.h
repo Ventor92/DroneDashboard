@@ -29,6 +29,7 @@ signals:
 
 private:
     void appendToSocketList(QTcpSocket* socket);
+    void sendMessage(QTcpSocket* socket, const QByteArray &byteArray);
 
     QTcpServer *ptrServer;
     QSet<QTcpSocket*> connection_set;
