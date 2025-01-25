@@ -6,12 +6,13 @@
 
 #include <QThread>
 #include <QTextStream>
-// #include <iostream>
+#include <QTimer>
 
 #include <QDebug>
 
 #include "cliengine.h"
 #include "tcpserver.h"
+#include "workerdata.h"
 
 static QTcpServer* m_server;
 
@@ -21,6 +22,24 @@ int main(int argc, char *argv[])
 
     CliEngine cliEngine;
     TcpServer tcpServer;
+
+    QThread threadWorkerData;
+    WorkerData workerData;
+
+    workerData.moveToThread(&threadWorkerData);
+
+    // Połączenie sygnałów i slotów
+    QObject::connect(&workerData, &WorkerData::newData, &tcpServer, &TcpServer::processData);
+
+    QTimer timer;
+    timer.moveToThread(&threadWorkerData);
+    QObject::connect(&timer, &QTimer::timeout, &workerData, &WorkerData::doWork);
+
+    QObject::connect(&threadWorkerData, &QThread::started, [&]() {
+        timer.start(2000); // Interwał w milisekundach (1 sekunda)
+    });
+
+    threadWorkerData.start();
 
     // Set up code that uses the Qt event loop here.
     // Call a.quit() or a.exit() to quit the application.
@@ -32,6 +51,11 @@ int main(int argc, char *argv[])
 
     // If you do not need a running Qt event loop, remove the call
     // to a.exec() or use the Non-Qt Plain C++ Application template.
+    if (QThread::currentThread() == QCoreApplication::instance()->thread()) {
+        qDebug() << "Jesteśmy w głównym wątku!";
+    } else {
+        qDebug() << "Jesteśmy w innym wątku!";
+    }
 
     qDebug() << "Application started. Type 'exit' to quit.";
     return a.exec();

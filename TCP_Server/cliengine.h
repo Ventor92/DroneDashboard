@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QThread>
-#include <QDebug>
 #include <QTextStream>
 
 class CliEngine : public QObject

@@ -35,6 +35,11 @@ void TcpServer::displayMessage(const QString& str)
     qDebug() << str;
 }
 
+void TcpServer::processData(const int id, const QString &text)
+{
+    displayMessage(QString("INFO :: próba wysłania %1 %2").arg(id).arg(text));
+}
+
 void TcpServer::newConnectionDetected()
 {
     while (ptrServer->hasPendingConnections())

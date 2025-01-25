@@ -22,6 +22,8 @@ public slots:
     void displayError(QAbstractSocket::SocketError socketError);
     void displayMessage(const QString& str);
 
+    void processData(const int id, const QString &text);
+
 signals:
     void newMessage(QString);
 

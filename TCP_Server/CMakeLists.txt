@@ -17,6 +17,7 @@ add_executable(TCP_Server
   main.cpp
   cliengine.h cliengine.cpp
   tcpserver.h tcpserver.cpp
+  workerdata.h workerdata.cpp
 
 )
 target_link_libraries(TCP_Server Qt${QT_VERSION_MAJOR}::Core)

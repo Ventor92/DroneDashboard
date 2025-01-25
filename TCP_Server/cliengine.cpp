@@ -1,3 +1,5 @@
+#include <QDebug>
+
 #include "cliengine.h"
 // #include "linenoise.h"
 
